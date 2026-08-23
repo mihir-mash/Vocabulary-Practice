@@ -4,29 +4,26 @@ const RATINGS = [
   {
     id: 'hard',
     label: 'Hard',
-    sublabel: '+1 day',
+    sublabel: 'Reset to 1d',
     color: '#ef4444',
-    bg: 'rgba(239,68,68,0.15)',
-    border: 'rgba(239,68,68,0.35)',
-    emoji: '😓',
+    bg: 'rgba(239, 68, 68, 0.1)',
+    border: 'rgba(239, 68, 68, 0.25)',
   },
   {
     id: 'good',
     label: 'Good',
-    sublabel: '×2.5',
+    sublabel: '×2.5 interval',
     color: '#f59e0b',
-    bg: 'rgba(245,158,11,0.15)',
-    border: 'rgba(245,158,11,0.35)',
-    emoji: '👍',
+    bg: 'rgba(245, 158, 11, 0.1)',
+    border: 'rgba(245, 158, 11, 0.25)',
   },
   {
     id: 'easy',
     label: 'Easy',
-    sublabel: '×3.5',
+    sublabel: '×3.5 interval',
     color: '#10b981',
-    bg: 'rgba(16,185,129,0.15)',
-    border: 'rgba(16,185,129,0.35)',
-    emoji: '🚀',
+    bg: 'rgba(16, 185, 129, 0.1)',
+    border: 'rgba(16, 185, 129, 0.25)',
   },
 ]
 
@@ -39,11 +36,11 @@ export default function SRSButtons({ onRate, disabled = false }) {
       style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(3, 1fr)',
-        gap: '10px',
-        padding: '16px',
-        borderTop: '1px solid rgba(255,255,255,0.07)',
+        gap: '8px',
+        padding: '12px 16px',
+        borderTop: '1px solid var(--border)',
         background: 'var(--bg-card)',
-        borderRadius: '0 0 20px 20px',
+        borderRadius: '0 0 18px 18px',
         flexShrink: 0,
       }}
     >
@@ -51,36 +48,34 @@ export default function SRSButtons({ onRate, disabled = false }) {
         <motion.button
           key={r.id}
           id={`srs-btn-${r.id}`}
-          whileHover={{ scale: 1.04, y: -2 }}
-          whileTap={{ scale: 0.96 }}
+          whileTap={{ scale: 0.97 }}
           onClick={() => !disabled && onRate(r.id)}
           disabled={disabled}
           style={{
             background: r.bg,
             border: `1px solid ${r.border}`,
-            borderRadius: '14px',
-            padding: '12px 8px',
+            borderRadius: '10px',
+            padding: '10px 6px',
             cursor: disabled ? 'not-allowed' : 'pointer',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            gap: '4px',
-            transition: 'all 0.2s ease',
+            gap: '2px',
+            transition: 'background 0.15s',
             opacity: disabled ? 0.5 : 1,
+            fontFamily: 'Inter, sans-serif',
           }}
         >
-          <span style={{ fontSize: '1.2rem' }}>{r.emoji}</span>
           <span
             style={{
               color: r.color,
               fontWeight: 700,
-              fontSize: '0.9rem',
-              letterSpacing: '0.02em',
+              fontSize: '0.85rem',
             }}
           >
             {r.label}
           </span>
-          <span style={{ color: 'var(--text-muted)', fontSize: '0.65rem', fontWeight: 500 }}>
+          <span style={{ color: 'var(--text-muted)', fontSize: '0.68rem', fontWeight: 500 }}>
             {r.sublabel}
           </span>
         </motion.button>

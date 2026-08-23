@@ -7,8 +7,17 @@ export function parseApiResponse(data) {
   if (!data || !data.length) return null
   const entry = data[0]
 
-  // Find an audio URL from phonetics
-  const audioUrl = entry.phonetics?.find((p) => p.audio && p.audio.trim() !== '')?.audio || null
+  // Find an audio URL across all entries and phonetics
+  let audioUrl = null
+  for (const item of data) {
+    if (item.phonetics && Array.isArray(item.phonetics)) {
+      const found = item.phonetics.find((p) => p.audio && p.audio.trim() !== '')
+      if (found) {
+        audioUrl = found.audio
+        break
+      }
+    }
+  }
 
   // Collect all meanings
   const meanings = entry.meanings || []
@@ -50,7 +59,7 @@ export function parseApiResponse(data) {
 
   return {
     word: entry.word,
-    phonetic: entry.phonetic || entry.phonetics?.[0]?.text || '',
+    phonetic: entry.phonetic || entry.phonetics?.find(p => p.text)?.text || '',
     audioUrl,
     partOfSpeech,
     primaryDefinition,

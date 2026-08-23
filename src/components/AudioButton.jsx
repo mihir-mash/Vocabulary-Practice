@@ -1,47 +1,66 @@
 import { Volume2 } from 'lucide-react'
-import { motion } from 'framer-motion'
 
 /**
- * A small button that plays the pronunciation audio for a word.
+ * Plays pronunciation audio for a word using API audio or Web Speech API fallback.
  */
-export default function AudioButton({ audioUrl, size = 'md' }) {
-  if (!audioUrl) return null
+export default function AudioButton({ word, audioUrl, size = 'md' }) {
+  const speakFallback = (text) => {
+    if (!text || typeof window === 'undefined' || !('speechSynthesis' in window)) return
+    try {
+      window.speechSynthesis.cancel()
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.lang = 'en-US'
+      utterance.rate = 0.9
+      window.speechSynthesis.speak(utterance)
+    } catch (e) {
+      console.warn('SpeechSynthesis fallback error:', e)
+    }
+  }
 
   const handlePlay = (e) => {
     e.stopPropagation()
-    // Ensure URL has a protocol
-    const url = audioUrl.startsWith('//') ? `https:${audioUrl}` : audioUrl
-    const audio = new Audio(url)
-    audio.play().catch((err) => console.warn('Audio playback failed:', err))
+
+    if (audioUrl && audioUrl.trim()) {
+      let url = audioUrl.trim()
+      if (url.startsWith('//')) url = 'https:' + url
+
+      if (url.startsWith('http')) {
+        const audio = new Audio(url)
+        audio.play().catch(() => {
+          speakFallback(word)
+        })
+        return
+      }
+    }
+
+    speakFallback(word)
   }
 
-  const sizeClasses = {
-    sm: 'p-1.5',
-    md: 'p-2',
-    lg: 'p-3',
-  }
-
-  const iconSizes = { sm: 14, md: 16, lg: 20 }
+  const dims = { sm: 14, md: 16, lg: 20 }
+  const pad  = { sm: '5px', md: '7px', lg: '9px' }
 
   return (
-    <motion.button
+    <button
       id="audio-play-btn"
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.9 }}
+      type="button"
       onClick={handlePlay}
-      className={`${sizeClasses[size]} rounded-full cursor-pointer`}
+      title={`Pronounce ${word || 'word'}`}
+      aria-label={`Pronounce ${word || 'word'}`}
       style={{
-        background: 'rgba(124, 58, 237, 0.2)',
-        border: '1px solid rgba(124, 58, 237, 0.35)',
-        color: '#a78bfa',
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
+        padding: pad[size] || '7px',
+        borderRadius: '50%',
+        border: '1px solid var(--pill-pos-border)',
+        background: 'var(--pill-pos-bg)',
+        color: 'var(--pill-pos-text)',
+        cursor: 'pointer',
+        transition: 'all 0.15s',
+        flexShrink: 0,
       }}
-      title="Play pronunciation"
-      aria-label="Play pronunciation"
     >
-      <Volume2 size={iconSizes[size]} />
-    </motion.button>
+      <Volume2 size={dims[size] || 16} />
+    </button>
   )
 }
