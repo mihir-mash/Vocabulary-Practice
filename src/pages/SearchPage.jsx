@@ -36,12 +36,12 @@ export default function SearchPage({ savedWords, onSaveWord, onMissingKey }) {
         messages: [
           {
             role: 'system',
-            content: 'You are an expert GRE vocabulary tutor. When given a word, respond with ONLY a raw JSON object (no markdown, no code fences, no extra text). Use this exact schema: { "word": string, "partOfSpeech": string, "definition": string, "sentences": [string, string], "etymology": string, "mnemonic": string, "synonyms": [string], "antonyms": [string] }'
+            content: 'You are an expert GRE vocabulary tutor. Output ONLY a valid JSON object with this exact structure and no other text: {"word": "string", "partOfSpeech": "string", "definition": "string", "sentences": ["string", "string"], "synonyms": ["string"], "antonyms": ["string"]}'
           },
-          { role: 'user', content: `Word: ${trimmed}` }
+          { role: 'user', content: `Analyze the GRE word: ${trimmed}` }
         ],
-        temperature: 0.3,
-        max_tokens: 600
+        temperature: 0.2,
+        max_tokens: 1000
       }
       const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
         method: 'POST',
@@ -53,19 +53,33 @@ export default function SearchPage({ savedWords, onSaveWord, onMissingKey }) {
       })
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}))
-        throw new Error(errData?.error?.message || `Groq API error ${res.status}`)
+        throw new Error(errData?.error?.message || `Groq API error (${res.status})`)
       }
       const data = await res.json()
       const contentStr = data.choices?.[0]?.message?.content ?? ''
-      // Strip any accidental markdown fences
-      const jsonStr = contentStr.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim()
-      const parsed = JSON.parse(jsonStr)
-      const required = ['word', 'partOfSpeech', 'definition', 'sentences']
-      for (const f of required) {
-        if (!parsed[f]) throw new Error(`Groq returned incomplete data (missing "${f}")`)
+
+      // Robust JSON extraction between the first { and last }
+      const firstBrace = contentStr.indexOf('{')
+      const lastBrace = contentStr.lastIndexOf('}')
+      if (firstBrace === -1 || lastBrace === -1 || lastBrace <= firstBrace) {
+        throw new Error('Model did not return valid JSON. Please try again.')
       }
+
+      const jsonCandidate = contentStr.substring(firstBrace, lastBrace + 1)
+      const parsed = JSON.parse(jsonCandidate)
+
+      const required = ['word', 'partOfSpeech', 'definition']
+      for (const f of required) {
+        if (!parsed[f]) throw new Error(`Missing "${f}" in response`)
+      }
+
       const wordObj = {
-        ...parsed,
+        word: parsed.word || trimmed,
+        partOfSpeech: parsed.partOfSpeech || '',
+        definition: parsed.definition || '',
+        sentences: Array.isArray(parsed.sentences) ? parsed.sentences : [],
+        synonyms: Array.isArray(parsed.synonyms) ? parsed.synonyms : [],
+        antonyms: Array.isArray(parsed.antonyms) ? parsed.antonyms : [],
         audioUrl: '',
         ...defaultSRS(),
         savedAt: new Date().toISOString()
@@ -76,7 +90,7 @@ export default function SearchPage({ savedWords, onSaveWord, onMissingKey }) {
     } finally {
       setLoading(false)
     }
-  }, [query, groqKey, onMissingKey])
+  }, [query, groqKey])
 
   const handleSave = () => {
     if (!wordData) return
