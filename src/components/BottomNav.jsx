@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion'
-import { Search, Layers, Settings } from 'lucide-react'
+import { Search, Layers, List } from 'lucide-react'
 
 const NAV_ITEMS = [
   { id: 'search', label: 'Search', icon: Search },
   { id: 'revise', label: 'Revise', icon: Layers },
-  { id: 'settings', label: 'Manage', icon: Settings },
+  { id: 'list',   label: 'List',   icon: List },
 ]
 
 /**

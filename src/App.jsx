@@ -2,15 +2,14 @@ import { useState, useCallback, useMemo, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Sun, Moon } from 'lucide-react'
 import { useLocalStorage } from './hooks/useLocalStorage'
-import { isDue } from './lib/srs'
 import SearchPage from './pages/SearchPage'
 import RevisePage from './pages/RevisePage'
-import SettingsPage from './pages/SettingsPage'
+import ListPage from './pages/ListPage'
 
 const TABS = [
-  { id: 'search',   label: 'Search' },
-  { id: 'revise',   label: 'Revise' },
-  { id: 'settings', label: 'Settings'   },
+  { id: 'search', label: 'Search' },
+  { id: 'revise', label: 'Revise' },
+  { id: 'list',   label: 'List'   },
 ]
 
 const pageVariants = {
@@ -33,7 +32,7 @@ export default function App() {
     setTheme((prev) => (prev === 'sunny' ? 'dark' : 'sunny'))
   }
 
-  const dueCount = useMemo(() => savedWords.filter(isDue).length, [savedWords])
+  const hardCount = useMemo(() => savedWords.filter((w) => w.difficulty === 'hard').length, [savedWords])
 
   const handleSaveWord = useCallback((wordData) => {
     setSavedWords((prev) => {
@@ -81,21 +80,8 @@ export default function App() {
         }}>
           {/* Wordmark */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <span style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
-              vocab
-            </span>
-            <span style={{
-              fontSize: '0.65rem',
-              fontWeight: 600,
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              color: 'var(--accent-light)',
-              background: 'var(--pill-pos-bg)',
-              border: '1px solid var(--pill-pos-border)',
-              padding: '2px 6px',
-              borderRadius: '4px',
-            }}>
-              SRS
+            <span style={{ fontWeight: 800, fontSize: '1.2rem', color: 'var(--text-primary)', letterSpacing: '-0.03em' }}>
+              Vocab
             </span>
           </div>
 
@@ -128,10 +114,10 @@ export default function App() {
                     }}
                   >
                     {label}
-                    {/* Due badge */}
-                    {id === 'revise' && dueCount > 0 && (
+                    {/* Hard words indicator badge */}
+                    {id === 'revise' && hardCount > 0 && (
                       <span style={{
-                        background: 'var(--accent)',
+                        background: '#ef4444',
                         color: '#fff',
                         borderRadius: '999px',
                         fontSize: '0.6rem',
@@ -139,7 +125,7 @@ export default function App() {
                         padding: '1px 5px',
                         lineHeight: 1.4,
                       }}>
-                        {dueCount > 99 ? '99+' : dueCount}
+                        {hardCount > 99 ? '99+' : hardCount}
                       </span>
                     )}
                   </button>
@@ -190,7 +176,7 @@ export default function App() {
         <AnimatePresence mode="wait">
           {activeTab === 'search' && (
             <motion.div key="search" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.2 }}>
-                <SearchPage savedWords={savedWords} onSaveWord={handleSaveWord} onMissingKey={() => setActiveTab('settings')} />
+              <SearchPage savedWords={savedWords} onSaveWord={handleSaveWord} />
             </motion.div>
           )}
           {activeTab === 'revise' && (
@@ -198,9 +184,9 @@ export default function App() {
               <RevisePage savedWords={savedWords} onUpdateWord={handleUpdateWord} />
             </motion.div>
           )}
-          {activeTab === 'settings' && (
-            <motion.div key="settings" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.2 }}>
-              <SettingsPage savedWords={savedWords} onDeleteWord={handleDeleteWord} onClearAll={handleClearAll} />
+          {activeTab === 'list' && (
+            <motion.div key="list" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.2 }}>
+              <ListPage savedWords={savedWords} onDeleteWord={handleDeleteWord} onClearAll={handleClearAll} />
             </motion.div>
           )}
         </AnimatePresence>

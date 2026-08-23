@@ -1,79 +1,75 @@
 /**
- * SRS (Spaced Repetition System) — SM-2 lite algorithm
+ * Priority-based Vocabulary Practice System
+ * Hard words are prioritized and appear before Medium and Easy words in each round.
  */
 
-/**
- * Default SRS state for a newly saved word.
- */
+function shuffle(array) {
+  const arr = [...array]
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]]
+  }
+  return arr
+}
+
 export function defaultSRS() {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
   return {
-    nextReviewDate: today.toISOString(),
-    interval: 0,
-    easeFactor: 2.5,
+    difficulty: 'medium', // 'hard' | 'medium' | 'easy'
+    reviewCount: 0,
+    lastReviewed: null,
   }
 }
 
 /**
- * Compute the new SRS state after rating a word.
- * @param {object} word - The current word object with SRS fields
- * @param {'hard'|'good'|'easy'} rating
- * @returns {object} Updated word with new SRS fields
+ * Update word difficulty after user rates it.
+ * @param {object} word 
+ * @param {'hard'|'medium'|'good'|'easy'} rating 
  */
 export function rateWord(word, rating) {
-  const multipliers = { hard: 1, good: 2.5, easy: 3.5 }
-  const multiplier = multipliers[rating]
-
-  let newInterval
-  if (word.interval === 0) {
-    newInterval = 1
-  } else {
-    newInterval = Math.max(1, Math.round(word.interval * multiplier))
-  }
-
-  // Adjust ease factor slightly
-  const easeDeltas = { hard: -0.15, good: 0, easy: 0.1 }
-  const newEaseFactor = Math.max(1.3, (word.easeFactor || 2.5) + easeDeltas[rating])
-
-  const nextReview = new Date()
-  nextReview.setHours(0, 0, 0, 0)
-  nextReview.setDate(nextReview.getDate() + newInterval)
+  const normRating = rating === 'good' ? 'medium' : rating
 
   return {
     ...word,
-    interval: newInterval,
-    easeFactor: parseFloat(newEaseFactor.toFixed(2)),
-    nextReviewDate: nextReview.toISOString(),
+    difficulty: normRating,
+    reviewCount: (word.reviewCount || 0) + 1,
+    lastReviewed: new Date().toISOString(),
   }
 }
 
 /**
- * Check if a word is due for review today.
- * @param {object} word
- * @returns {boolean}
+ * Generate a prioritized practice deck:
+ * - Hard words appear FIRST (shuffled among themselves)
+ * - Medium words appear NEXT (shuffled among themselves)
+ * - Easy words appear LAST (shuffled among themselves)
+ * Each saved word appears once per round.
+ * @param {Array} words 
+ * @returns {Array} Ordered round deck
  */
-export function isDue(word) {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const reviewDate = new Date(word.nextReviewDate)
-  reviewDate.setHours(0, 0, 0, 0)
-  return reviewDate <= today
+export function buildPracticeDeck(words) {
+  if (!words || words.length === 0) return []
+
+  const hardWords = words.filter((w) => w.difficulty === 'hard')
+  const mediumWords = words.filter((w) => !w.difficulty || w.difficulty === 'medium')
+  const easyWords = words.filter((w) => w.difficulty === 'easy')
+
+  return [
+    ...shuffle(hardWords),
+    ...shuffle(mediumWords),
+    ...shuffle(easyWords),
+  ]
 }
 
 /**
- * Format a date string to a human-readable label.
- * @param {string} isoString
- * @returns {string}
+ * Format difficulty status for display
  */
-export function formatReviewDate(isoString) {
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
-  const date = new Date(isoString)
-  date.setHours(0, 0, 0, 0)
-  const diffDays = Math.round((date - today) / (1000 * 60 * 60 * 24))
-
-  if (diffDays <= 0) return 'Due now'
-  if (diffDays === 1) return 'Due tomorrow'
-  return `Due in ${diffDays} days`
+export function getDifficultyBadge(difficulty) {
+  switch (difficulty) {
+    case 'hard':
+      return { label: 'Hard', color: '#f87171', bg: 'rgba(239,68,68,0.12)', border: 'rgba(239,68,68,0.25)' }
+    case 'easy':
+      return { label: 'Easy', color: '#34d399', bg: 'rgba(16,185,129,0.12)', border: 'rgba(16,185,129,0.25)' }
+    case 'medium':
+    default:
+      return { label: 'Medium', color: '#fbbf24', bg: 'rgba(245,158,11,0.12)', border: 'rgba(245,158,11,0.25)' }
+  }
 }

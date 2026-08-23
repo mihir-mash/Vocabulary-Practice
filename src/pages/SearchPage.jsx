@@ -23,8 +23,7 @@ export default function SearchPage({ savedWords, onSaveWord, onMissingKey }) {
     if (!trimmed) return
 
     if (!groqKey) {
-      alert('Please enter your Groq API key in Settings.')
-      if (typeof onMissingKey === 'function') onMissingKey()
+      setError('VITE_GROQ_API_KEY is not configured in .env')
       return
     }
 

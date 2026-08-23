@@ -4,15 +4,15 @@ const RATINGS = [
   {
     id: 'hard',
     label: 'Hard',
-    sublabel: 'Reset to 1d',
+    sublabel: 'Show often',
     color: '#ef4444',
     bg: 'rgba(239, 68, 68, 0.1)',
     border: 'rgba(239, 68, 68, 0.25)',
   },
   {
-    id: 'good',
-    label: 'Good',
-    sublabel: '×2.5 interval',
+    id: 'medium',
+    label: 'Medium',
+    sublabel: 'Moderate',
     color: '#f59e0b',
     bg: 'rgba(245, 158, 11, 0.1)',
     border: 'rgba(245, 158, 11, 0.25)',
@@ -20,7 +20,7 @@ const RATINGS = [
   {
     id: 'easy',
     label: 'Easy',
-    sublabel: '×3.5 interval',
+    sublabel: 'Mastered',
     color: '#10b981',
     bg: 'rgba(16, 185, 129, 0.1)',
     border: 'rgba(16, 185, 129, 0.25)',
@@ -28,7 +28,7 @@ const RATINGS = [
 ]
 
 /**
- * Sticky bottom SRS rating buttons shown on the back of a flashcard.
+ * Sticky bottom frequency rating buttons shown on the back of a flashcard.
  */
 export default function SRSButtons({ onRate, disabled = false }) {
   return (
