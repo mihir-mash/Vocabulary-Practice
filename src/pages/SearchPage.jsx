@@ -2,14 +2,14 @@ import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, X, Loader2, AlertCircle } from 'lucide-react'
 import WordCard from '../components/WordCard'
-import { parseApiResponse } from '../lib/dictionary'
 import { defaultSRS } from '../lib/srs'
 
-export default function SearchPage({ savedWords, onSaveWord }) {
+export default function SearchPage({ savedWords, onSaveWord, onMissingKey }) {
   const [query, setQuery]       = useState('')
   const [wordData, setWordData] = useState(null)
   const [loading, setLoading]   = useState(false)
   const [error, setError]       = useState(null)
+  const groqKey = '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'
   const [toast, setToast]       = useState(null)
 
   const showToast = (msg, type = 'info') => {
@@ -22,26 +22,62 @@ export default function SearchPage({ savedWords, onSaveWord }) {
     const trimmed = query.trim().toLowerCase()
     if (!trimmed) return
 
+    if (!groqKey) {
+      alert('Please enter your Groq API key in Settings.')
+      if (typeof onMissingKey === 'function') onMissingKey()
+      return
+    }
+
     setLoading(true)
     setError(null)
     setWordData(null)
-
     try {
-      const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(trimmed)}`)
-      if (!res.ok) {
-        if (res.status === 404) throw new Error(`"${trimmed}" not found in the dictionary.`)
-        throw new Error('Something went wrong. Try again.')
+      const payload = {
+        model: 'openai/gpt-oss-20b',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are an expert GRE vocabulary tutor. When given a word, respond with ONLY a raw JSON object (no markdown, no code fences, no extra text). Use this exact schema: { "word": string, "partOfSpeech": string, "definition": string, "sentences": [string, string], "etymology": string, "mnemonic": string, "synonyms": [string], "antonyms": [string] }'
+          },
+          { role: 'user', content: `Word: ${trimmed}` }
+        ],
+        temperature: 0.3,
+        max_tokens: 600
       }
-      const data   = await res.json()
-      const parsed = parseApiResponse(data)
-      if (!parsed) throw new Error('Could not parse the response for this word.')
-      setWordData(parsed)
+      const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${groqKey}`
+        },
+        body: JSON.stringify(payload)
+      })
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}))
+        throw new Error(errData?.error?.message || `Groq API error ${res.status}`)
+      }
+      const data = await res.json()
+      const contentStr = data.choices?.[0]?.message?.content ?? ''
+      // Strip any accidental markdown fences
+      const jsonStr = contentStr.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim()
+      const parsed = JSON.parse(jsonStr)
+      const required = ['word', 'partOfSpeech', 'definition', 'sentences']
+      for (const f of required) {
+        if (!parsed[f]) throw new Error(`Groq returned incomplete data (missing "${f}")`)
+      }
+      const wordObj = {
+        ...parsed,
+        audioUrl: '',
+        ...defaultSRS(),
+        savedAt: new Date().toISOString()
+      }
+      setWordData(wordObj)
     } catch (err) {
       setError(err.message)
     } finally {
       setLoading(false)
     }
-  }, [query])
+  }, [query, groqKey, onMissingKey])
 
   const handleSave = () => {
     if (!wordData) return

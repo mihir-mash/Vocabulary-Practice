@@ -132,40 +132,25 @@ export default function FlashCard({ word, onRate, cardIndex, totalCards }) {
                 <AudioButton word={word.word} audioUrl={word.audioUrl} size="sm" />
               </div>
 
-              {(word.allMeanings || []).map((meaning, mi) => (
-                <div key={mi} style={{ marginBottom: '16px' }}>
-                  <span className="pill-pos" style={{ marginBottom: '8px', display: 'inline-block' }}>
-                    {meaning.partOfSpeech}
-                  </span>
-                  {meaning.definitions.map((def, di) => (
-                    <div key={di} style={{ marginBottom: '10px' }}>
-                      <p style={{ color: 'var(--text-primary)', fontSize: '0.9rem', lineHeight: 1.6, margin: 0 }}>
-                        {def.definition}
-                      </p>
-                      {def.example && (
-                        <p style={{
-                          color: 'var(--text-secondary)',
-                          fontSize: '0.82rem',
-                          fontStyle: 'italic',
-                          lineHeight: 1.5,
-                          margin: '5px 0 0 0',
-                          paddingLeft: '10px',
-                          borderLeft: '2px solid var(--border-strong)',
-                        }}>
-                          "{def.example}"
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                  {meaning.synonyms?.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginTop: '8px' }}>
-                      {meaning.synonyms.map((s, si) => (
-                        <span key={si} className="pill-syn">{s}</span>
-                      ))}
-                    </div>
-                  )}
+              {/* New structured data */}
+              <p style={{ marginBottom: '8px', color: 'var(--text-primary)' }}><strong>Part of Speech:</strong> {word.partOfSpeech}</p>
+              <p style={{ marginBottom: '8px', color: 'var(--text-primary)' }}><strong>Definition:</strong> {word.definition}</p>
+              {word.sentences && word.sentences.length > 0 && (
+                <div style={{ marginBottom: '8px' }}>
+                  <strong>Example Sentences:</strong>
+                  <ul style={{ margin: '4px 0 0 16px' }}>
+                    {word.sentences.map((s, i) => (
+                      <li key={i} style={{ color: 'var(--text-primary)' }}>{s}</li>
+                    ))}
+                  </ul>
                 </div>
-              ))}
+              )}
+              {word.synonyms && word.synonyms.length > 0 && (
+                <p style={{ marginBottom: '8px', color: 'var(--text-primary)' }}><strong>Synonyms:</strong> {word.synonyms.join(', ')}</p>
+              )}
+              {word.antonyms && word.antonyms.length > 0 && (
+                <p style={{ marginBottom: '8px', color: 'var(--text-primary)' }}><strong>Antonyms:</strong> {word.antonyms.join(', ')}</p>
+              )}
             </div>
 
             {/* Sticky SRS buttons */}

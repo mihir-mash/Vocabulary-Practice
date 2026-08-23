@@ -10,7 +10,7 @@ import SettingsPage from './pages/SettingsPage'
 const TABS = [
   { id: 'search',   label: 'Search' },
   { id: 'revise',   label: 'Revise' },
-  { id: 'settings', label: 'List'   },
+  { id: 'settings', label: 'Settings'   },
 ]
 
 const pageVariants = {
@@ -190,7 +190,7 @@ export default function App() {
         <AnimatePresence mode="wait">
           {activeTab === 'search' && (
             <motion.div key="search" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.2 }}>
-              <SearchPage savedWords={savedWords} onSaveWord={handleSaveWord} />
+                <SearchPage savedWords={savedWords} onSaveWord={handleSaveWord} onMissingKey={() => setActiveTab('settings')} />
             </motion.div>
           )}
           {activeTab === 'revise' && (

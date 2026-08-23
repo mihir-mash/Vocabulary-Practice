@@ -59,63 +59,69 @@ export default function WordCard({ wordData, isSaved, onSave }) {
         </button>
       </div>
 
-      {/* Meanings */}
-      <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-        {(wordData.allMeanings || []).map((meaning, mi) => (
-          <div key={mi}>
-            <span className="pill-pos" style={{ marginBottom: '10px', display: 'inline-block' }}>
-              {meaning.partOfSpeech}
-            </span>
+      {/* Meanings / Definition */}
+      <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {meaning.definitions.map((def, di) => (
-                <div key={di}>
-                  <p style={{
-                    color: 'var(--text-primary)',
-                    fontSize: '0.93rem',
-                    lineHeight: 1.65,
-                    margin: 0,
-                  }}>
-                    {def.definition}
-                  </p>
-                  {def.example && (
-                    <p style={{
-                      color: 'var(--text-secondary)',
-                      fontSize: '0.84rem',
-                      fontStyle: 'italic',
-                      lineHeight: 1.55,
-                      margin: '6px 0 0 0',
-                      paddingLeft: '12px',
-                      borderLeft: '2px solid var(--border-strong)',
-                    }}>
-                      "{def.example}"
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-
-            {meaning.synonyms?.length > 0 && (
-              <div style={{ marginTop: '10px' }}>
-                <p style={{
-                  fontSize: '0.72rem',
-                  fontWeight: 600,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                  color: 'var(--text-muted)',
-                  margin: '0 0 6px 0',
-                }}>
-                  Synonyms
-                </p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                  {meaning.synonyms.map((s, si) => (
-                    <span key={si} className="pill-syn">{s}</span>
-                  ))}
-                </div>
-              </div>
+        {/* Part of speech + definition */}
+        {(wordData.partOfSpeech || wordData.definition) && (
+          <div>
+            {wordData.partOfSpeech && (
+              <span className="pill-pos" style={{ marginBottom: '10px', display: 'inline-block' }}>
+                {wordData.partOfSpeech}
+              </span>
+            )}
+            {wordData.definition && (
+              <p style={{ color: 'var(--text-primary)', fontSize: '0.93rem', lineHeight: 1.65, margin: 0 }}>
+                {wordData.definition}
+              </p>
             )}
           </div>
-        ))}
+        )}
+
+        {/* Example sentences */}
+        {wordData.sentences && wordData.sentences.length > 0 && (
+          <div>
+            <p style={{ fontSize: '0.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', margin: '0 0 8px 0' }}>
+              Example Sentences
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {wordData.sentences.map((s, i) => (
+                <p key={i} style={{ color: 'var(--text-secondary)', fontSize: '0.84rem', fontStyle: 'italic', lineHeight: 1.55, margin: 0, paddingLeft: '12px', borderLeft: '2px solid var(--border-strong)' }}>
+                  "{s}"
+                </p>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Synonyms */}
+        {wordData.synonyms && wordData.synonyms.length > 0 && (
+          <div>
+            <p style={{ fontSize: '0.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', margin: '0 0 6px 0' }}>
+              Synonyms
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+              {wordData.synonyms.map((s, i) => (
+                <span key={i} className="pill-syn">{s}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Antonyms */}
+        {wordData.antonyms && wordData.antonyms.length > 0 && (
+          <div>
+            <p style={{ fontSize: '0.72rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-muted)', margin: '0 0 6px 0' }}>
+              Antonyms
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+              {wordData.antonyms.map((a, i) => (
+                <span key={i} className="pill-syn" style={{ background: 'rgba(239,68,68,0.1)', color: '#f87171', borderColor: 'rgba(239,68,68,0.2)' }}>{a}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
       </div>
     </motion.div>
   )

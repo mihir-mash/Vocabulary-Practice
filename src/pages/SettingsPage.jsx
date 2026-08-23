@@ -1,10 +1,12 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Trash2, AlertTriangle } from 'lucide-react'
-import { formatReviewDate, isDue } from '../lib/srs'
+import { useState } from 'react';
+import { useLocalStorage } from '../hooks/useLocalStorage';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Trash2, AlertTriangle } from 'lucide-react';
+import { formatReviewDate, isDue } from '../lib/srs';
 
 export default function SettingsPage({ savedWords, onDeleteWord, onClearAll }) {
-  const [confirmClear, setConfirmClear] = useState(false)
+  const [confirmClear, setConfirmClear] = useState(false);
+  const [groqKey, setGroqKey] = useLocalStorage('groq-api-key', '');
   const [searchFilter, setSearchFilter] = useState('')
 
   const filtered = savedWords.filter((w) =>
@@ -14,6 +16,19 @@ export default function SettingsPage({ savedWords, onDeleteWord, onClearAll }) {
   return (
     <div style={{ padding: '24px 20px 60px', maxWidth: '640px', margin: '0 auto' }}>
       <div style={{ marginBottom: '20px' }}>
+        {/* Groq API Key Input */}
+        <div style={{ marginBottom: '12px' }}>
+          <label htmlFor="groq-key" style={{ display: 'block', color: 'var(--text-muted)', marginBottom: '4px' }}>Groq API Key</label>
+          <input
+            id="groq-key"
+            type="password"
+            placeholder="Enter your Groq API key"
+            value={groqKey}
+            onChange={(e) => setGroqKey(e.target.value)}
+            className="field"
+            style={{ width: '100%', padding: '8px 12px' }}
+          />
+        </div>
         <h1 style={{ fontSize: '1.15rem', fontWeight: 700, margin: '0 0 4px 0', color: 'var(--text-primary)' }}>
           Saved Vocabulary
         </h1>
