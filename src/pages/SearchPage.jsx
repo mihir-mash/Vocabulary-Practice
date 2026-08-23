@@ -9,7 +9,7 @@ export default function SearchPage({ savedWords, onSaveWord, onMissingKey }) {
   const [wordData, setWordData] = useState(null)
   const [loading, setLoading]   = useState(false)
   const [error, setError]       = useState(null)
-  const groqKey = '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'
+  const groqKey = import.meta.env.VITE_GROQ_API_KEY
   const [toast, setToast]       = useState(null)
 
   const showToast = (msg, type = 'info') => {
