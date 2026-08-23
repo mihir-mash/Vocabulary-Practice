@@ -2,21 +2,23 @@
 
 @layer base {
   :root {
-  --bg-primary: #111118;
-  --bg-card: #1c1c26;
-  --bg-surface: #22222e;
-  --accent: #d97706;   /* amber accent for dark mode */
-  --accent-light: #f59e0b;
-  --pill-pos-bg: rgba(217, 119, 6, 0.18);
-  --pill-pos-text: #fcd34d;
-  --pill-pos-border: rgba(217, 119, 6, 0.28);
-  --text-primary: #e8e8f0;
-  --text-secondary: #9090a8;
-  --text-muted: #55556a;
-  --border: rgba(255, 255, 255, 0.07);
-  --border-strong: rgba(255, 255, 255, 0.12);
-  --header-bg: rgba(17, 17, 24, 0.92);
-}
+    --bg-primary: #111118;
+    --bg-card: #1c1c26;
+    --bg-surface: #22222e;
+    --accent: #d97706;   /* amber accent for dark mode */
+    --accent-light: #f59e0b;
+    --pill-pos-bg: rgba(217, 119, 6, 0.18);
+    --pill-pos-text: #fcd34d;
+    --pill-pos-border: rgba(217, 119, 6, 0.28);
+    --text-primary: #e8e8f0;
+    --text-secondary: #9090a8;
+    --text-muted: #55556a;
+    --border: rgba(255, 255, 255, 0.07);
+    --border-strong: rgba(255, 255, 255, 0.12);
+    --header-bg: rgba(17, 17, 24, 0.92);
+  }
+
+  [data-theme="warm"] {
     --bg-primary: #1f1810;
     --bg-card: #2a2016;
     --bg-surface: #35291b;
@@ -34,21 +36,6 @@
   }
 
   [data-theme="sunny"] {
-  --bg-primary: #fff9c4;   /* soft yellow */
-  --bg-card: #fff3b0;     /* lighter card */
-  --bg-surface: #ffec9d;   /* surface */
-  --accent: #b8860b;      /* warm brown */
-  --accent-light: #d4a373;/* lighter accent */
-  --pill-pos-bg: rgba(184, 134, 11, 0.18);
-  --pill-pos-text: #ffec9d;
-  --pill-pos-border: rgba(184, 134, 11, 0.35);
-  --text-primary: #3b3000;/* dark text */
-  --text-secondary: #5a4700;
-  --text-muted: #8c7355;
-  --border: rgba(184, 134, 11, 0.15);
-  --border-strong: rgba(184, 134, 11, 0.28);
-  --header-bg: rgba(255, 249, 196, 0.92);
-}
     --bg-primary: #fef9c3;
     --bg-card: #ffffff;
     --bg-surface: #fef08a;
