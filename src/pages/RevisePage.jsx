@@ -10,27 +10,43 @@ const cardVariants = {
 }
 
 export default function RevisePage({ savedWords, onUpdateWord }) {
-  const dueWords = useMemo(() => savedWords.filter(isDue), [savedWords])
-  const [index, setIndex] = useState(0)
-  const [sessionDone, setSessionDone] = useState(false)
+  // Initialize session with current due words
+  const [sessionDeck, setSessionDeck] = useState(() => savedWords.filter(isDue))
+  const [currentIndex, setCurrentIndex] = useState(0)
+  const [reviewedCount, setReviewedCount] = useState(0)
+  const [isFinished, setIsFinished] = useState(false)
+
+  // Total cards in this session
+  const totalCards = sessionDeck.length
 
   const handleRate = useCallback(
     async (rating) => {
-      const current = dueWords[index]
+      const current = sessionDeck[currentIndex]
       if (!current) return
+
       const updated = rateWord(current, rating)
       onUpdateWord(updated)
 
       await new Promise((r) => setTimeout(r, 180))
 
-      if (index + 1 >= dueWords.length) {
-        setSessionDone(true)
+      const nextIndex = currentIndex + 1
+      setReviewedCount((c) => c + 1)
+
+      if (nextIndex >= sessionDeck.length) {
+        setIsFinished(true)
       } else {
-        setIndex((prev) => prev + 1)
+        setCurrentIndex(nextIndex)
       }
     },
-    [dueWords, index, onUpdateWord]
+    [sessionDeck, currentIndex, onUpdateWord]
   )
+
+  const handlePracticeAll = () => {
+    setSessionDeck([...savedWords])
+    setCurrentIndex(0)
+    setReviewedCount(0)
+    setIsFinished(false)
+  }
 
   if (savedWords.length === 0) {
     return (
@@ -41,7 +57,7 @@ export default function RevisePage({ savedWords, onUpdateWord }) {
     )
   }
 
-  if (sessionDone || dueWords.length === 0) {
+  if (isFinished || totalCards === 0) {
     return (
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -59,28 +75,42 @@ export default function RevisePage({ savedWords, onUpdateWord }) {
         }}
       >
         <h2 style={{ fontSize: '1.4rem', fontWeight: 700, margin: '0 0 8px 0', color: 'var(--text-primary)' }}>
-          {sessionDone ? 'Session finished' : 'All caught up'}
+          {isFinished ? 'Session finished' : 'All caught up! 🎉'}
         </h2>
         <p style={{ color: 'var(--text-secondary)', margin: '0 0 20px 0', fontSize: '0.9rem', lineHeight: 1.6 }}>
-          {sessionDone
-            ? `Reviewed ${dueWords.length} word${dueWords.length !== 1 ? 's' : ''}. Check back tomorrow for your next review.`
-            : `No words are currently due for review out of ${savedWords.length} total word${savedWords.length !== 1 ? 's' : ''}.`}
+          {isFinished
+            ? `Reviewed ${reviewedCount} word${reviewedCount !== 1 ? 's' : ''}. Check back later for your next scheduled review.`
+            : `No words are currently due for review out of ${savedWords.length} total in your deck.`}
         </p>
-        <div style={{
-          padding: '12px 18px',
-          background: 'var(--bg-card)',
-          borderRadius: '12px',
-          border: '1px solid var(--border)',
-          fontSize: '0.82rem',
-          color: 'var(--text-muted)',
-        }}>
-          {savedWords.length} total in deck &nbsp;·&nbsp; {savedWords.filter((w) => !isDue(w)).length} up to date
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
+          <div style={{
+            padding: '12px 18px',
+            background: 'var(--bg-card)',
+            borderRadius: '12px',
+            border: '1px solid var(--border)',
+            fontSize: '0.82rem',
+            color: 'var(--text-muted)',
+          }}>
+            {savedWords.length} total in deck &nbsp;·&nbsp; {savedWords.filter((w) => !isDue(w)).length} up to date
+          </div>
+
+          {savedWords.length > 0 && (
+            <button
+              onClick={handlePracticeAll}
+              className="btn btn-ghost"
+              style={{ marginTop: '8px', fontSize: '0.85rem' }}
+            >
+              Practice entire deck anyway
+            </button>
+          )}
         </div>
       </motion.div>
     )
   }
 
-  const currentWord = dueWords[index]
+  const currentWord = sessionDeck[currentIndex]
+  if (!currentWord) return null
 
   return (
     <div style={{ padding: '24px 20px 60px', maxWidth: '520px', margin: '0 auto' }}>
@@ -89,13 +119,13 @@ export default function RevisePage({ savedWords, onUpdateWord }) {
           Flashcards
         </h1>
         <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '0.82rem' }}>
-          {dueWords.length} word{dueWords.length !== 1 ? 's' : ''} due for review
+          {totalCards - currentIndex} word{totalCards - currentIndex !== 1 ? 's' : ''} remaining in session
         </p>
       </div>
 
       <AnimatePresence mode="wait">
         <motion.div
-          key={`${currentWord.word}-${index}`}
+          key={`${currentWord.word}-${currentIndex}`}
           variants={cardVariants}
           initial="enter"
           animate="center"
@@ -105,8 +135,8 @@ export default function RevisePage({ savedWords, onUpdateWord }) {
           <FlashCard
             word={currentWord}
             onRate={handleRate}
-            cardIndex={index}
-            totalCards={dueWords.length}
+            cardIndex={currentIndex}
+            totalCards={totalCards}
           />
         </motion.div>
       </AnimatePresence>
