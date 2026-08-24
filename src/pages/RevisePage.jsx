@@ -1,8 +1,8 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import FlashCard from '../components/FlashCard'
 import { rateWord, buildPracticeDeck } from '../lib/srs'
-import { RotateCw, CheckCircle2, Flame } from 'lucide-react'
+import { RotateCw, CheckCircle2, Flame, Loader2 } from 'lucide-react'
 
 const cardVariants = {
   enter: { opacity: 0, x: 40 },
@@ -10,12 +10,19 @@ const cardVariants = {
   exit: { opacity: 0, x: -40 },
 }
 
-export default function RevisePage({ savedWords, onUpdateWord }) {
+export default function RevisePage({ savedWords, onUpdateWord, loadingWords }) {
   // Initialize practice round: Hard words first, then Medium, then Easy
   const [sessionDeck, setSessionDeck] = useState(() => buildPracticeDeck(savedWords))
   const [currentIndex, setCurrentIndex] = useState(0)
   const [reviewedCount, setReviewedCount] = useState(0)
   const [isFinished, setIsFinished] = useState(false)
+
+  // Sync sessionDeck if initial deck was empty and savedWords loaded
+  useEffect(() => {
+    if (sessionDeck.length === 0 && savedWords.length > 0 && !isFinished) {
+      setSessionDeck(buildPracticeDeck(savedWords))
+    }
+  }, [savedWords, sessionDeck.length, isFinished])
 
   const totalCards = sessionDeck.length
 
@@ -47,6 +54,16 @@ export default function RevisePage({ savedWords, onUpdateWord }) {
     setCurrentIndex(0)
     setReviewedCount(0)
     setIsFinished(false)
+  }
+
+  if (loadingWords) {
+    return (
+      <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
+        <Loader2 size={24} style={{ animation: 'spin 0.9s linear infinite', margin: '0 auto 12px' }} />
+        <p style={{ fontSize: '0.88rem', margin: 0 }}>Loading revision cards from Firestore...</p>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    )
   }
 
   if (savedWords.length === 0) {
