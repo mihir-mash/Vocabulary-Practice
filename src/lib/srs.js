@@ -48,9 +48,17 @@ export function rateWord(word, rating) {
 export function buildPracticeDeck(words) {
   if (!words || words.length === 0) return []
 
-  const hardWords = words.filter((w) => w.difficulty === 'hard')
-  const mediumWords = words.filter((w) => !w.difficulty || w.difficulty === 'medium')
-  const easyWords = words.filter((w) => w.difficulty === 'easy')
+  // Deduplicate by word string so no word can appear twice in one round
+  const seen = new Set()
+  const unique = words.filter(w => {
+    if (seen.has(w.word)) return false
+    seen.add(w.word)
+    return true
+  })
+
+  const hardWords   = unique.filter(w => w.difficulty === 'hard')
+  const mediumWords = unique.filter(w => w.difficulty === 'medium')
+  const easyWords   = unique.filter(w => w.difficulty === 'easy')
 
   return [
     ...shuffle(hardWords),
