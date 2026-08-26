@@ -14,7 +14,7 @@ function shuffle(array) {
 
 export function defaultSRS() {
   return {
-    difficulty: 'medium', // 'hard' | 'medium' | 'easy'
+    difficulty: 'hard', // 'hard' | 'medium' | 'easy'
     reviewCount: 0,
     lastReviewed: null,
   }
