@@ -6,7 +6,7 @@ import { RotateCw, CheckCircle2, Flame, Loader2 } from 'lucide-react';
 
 const DIFFICULTIES = ['hard', 'medium', 'easy'];
 const DIFFICULTY_LABELS = { hard: 'Hard', medium: 'Medium', easy: 'Easy' };
-const DIFFICULTY_COLORS = { hard: '#f87171', medium: '#fbbf24', easy: '#34d399' };
+const DIFFICULTY_COLORS = { hard: '#cf1f1f', medium: '#fb24d3', easy: '#34d399' };
 
 const cardVariants = {
   enter: { opacity: 0, x: 40 },
