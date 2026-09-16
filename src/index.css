@@ -85,6 +85,41 @@
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 999px; }
+
+  /* Mobile/Responsive adjustments */
+  @media (max-width: 639px) {
+    /* Hide desktop nav on mobile */
+    nav {
+      display: none !important;
+    }
+    
+    /* Show mobile menu button */
+    #mobile-menu-btn {
+      display: flex !important;
+    }
+
+    /* Theme toggle text hidden on mobile */
+    #theme-toggle-btn span {
+      display: none !important;
+    }
+  }
+
+  @media (min-width: 640px) {
+    /* Show desktop nav on desktop */
+    nav {
+      display: flex !important;
+    }
+
+    /* Hide mobile menu button */
+    #mobile-menu-btn {
+      display: none !important;
+    }
+
+    /* Theme toggle text visible on desktop */
+    #theme-toggle-btn span {
+      display: inline !important;
+    }
+  }
 }
 
 @layer utilities {
@@ -185,5 +220,25 @@
     border: none;
     border-top: 1px solid var(--border);
     margin: 16px 0;
+  }
+
+  /* Responsive grid adjustments */
+  @media (max-width: 639px) {
+    /* Mobile: stack and adjust padding */
+    [style*="gridTemplateColumns: repeat(auto-fit"] {
+      grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    /* Reduce padding on mobile */
+    [style*="padding: 24px 20px"] {
+      padding: 16px 14px !important;
+    }
+  }
+
+  @media (min-width: 640px) {
+    /* Desktop: normal grid layout */
+    [style*="gridTemplateColumns: repeat(auto-fit"] {
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
+    }
   }
 }

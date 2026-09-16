@@ -4,7 +4,7 @@ import { Search, X, Loader2, AlertCircle } from 'lucide-react'
 import WordCard from '../components/WordCard'
 import { defaultSRS } from '../lib/srs'
 
-export default function SearchPage({ savedWords, onSaveWord, onMissingKey }) {
+export default function SearchPage({ savedWords, onSaveWord }) {
   const [query, setQuery]       = useState('')
   const [wordData, setWordData] = useState(null)
   const [loading, setLoading]   = useState(false)

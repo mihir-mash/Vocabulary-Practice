@@ -1,16 +1,18 @@
 import { useState, useCallback, useMemo, useEffect } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Sun, Moon, User, Loader2 } from 'lucide-react'
+import { Sun, Moon, User, Menu, X } from 'lucide-react'
 import { collection, onSnapshot, doc, setDoc, deleteDoc, writeBatch } from 'firebase/firestore'
 import { db } from './firebase'
 import { useLocalStorage } from './hooks/useLocalStorage'
 import SearchPage from './pages/SearchPage'
 import RevisePage from './pages/RevisePage'
 import ListPage from './pages/ListPage'
+import SimilarWordsPage from './pages/SimilarWordsPage'
 
 const TABS = [
   { id: 'search', label: 'Search' },
   { id: 'revise', label: 'Revise' },
+  { id: 'similar', label: 'Similar' },
   { id: 'list',   label: 'List'   },
 ]
 
@@ -23,19 +25,16 @@ const pageVariants = {
 export default function App() {
   const [activeTab, setActiveTab]           = useState('search')
   const [activeUsername, setActiveUsername] = useLocalStorage('activeUsername', 'mihir')
-  const [localWords, setLocalWords]         = useLocalStorage('vocab-srs-words', [])
+  const [_localWords]                       = useLocalStorage('vocab-srs-words', [])
   const [savedWords, setSavedWords]         = useState([])
   const [loadingWords, setLoadingWords]     = useState(true)
   const [theme, setTheme]                   = useLocalStorage('vocab-srs-theme', 'sunny')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   // Apply theme to html root tag
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
   }, [theme])
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === 'sunny' ? 'dark' : 'sunny'))
-  }
 
   // Subscribe to activeUsername's Firestore collection: users/{activeUsername}/words
   useEffect(() => {
@@ -61,7 +60,7 @@ export default function App() {
     return () => unsubscribe()
   }, [activeUsername])
 
-  const hardCount = useMemo(() => savedWords.filter((w) => w.difficulty === 'hard').length, [savedWords])
+  const _hardCount = useMemo(() => savedWords.filter((w) => w.difficulty === 'hard').length, [savedWords])
 
   // Save new word to Firestore
   const handleSaveWord = useCallback(async (wordData) => {
@@ -115,12 +114,12 @@ export default function App() {
 
   // Sync LocalStorage words to Firestore under activeUsername
   const handleMigrateLocalWords = useCallback(async () => {
-    if (!localWords || localWords.length === 0) return 0
+    if (!_localWords || _localWords.length === 0) return 0
     const cleanUsername = (activeUsername || 'mihir').trim().toLowerCase()
 
     const chunkSize = 450
-    for (let i = 0; i < localWords.length; i += chunkSize) {
-      const chunk = localWords.slice(i, i + chunkSize)
+    for (let i = 0; i < _localWords.length; i += chunkSize) {
+      const chunk = _localWords.slice(i, i + chunkSize)
       const batch = writeBatch(db)
       chunk.forEach((w) => {
         const wordId = (w.word || '').trim().toLowerCase()
@@ -131,8 +130,8 @@ export default function App() {
       })
       await batch.commit()
     }
-    return localWords.length
-  }, [activeUsername, localWords])
+    return _localWords.length
+  }, [activeUsername, _localWords])
 
   return (
     <div style={{ minHeight: '100dvh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column', transition: 'background-color 0.25s ease' }}>
@@ -186,10 +185,10 @@ export default function App() {
             </button>
           </div>
 
-          {/* Right section: Tabs + Theme switch */}
+          {/* Right section: Desktop nav + Theme + Mobile menu */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {/* Tab bar */}
-            <nav style={{ display: 'flex', gap: '2px' }}>
+            {/* Desktop tab bar (hidden on mobile) */}
+            <nav style={{ display: 'none', gap: '2px', '@media (min-width: 640px)': { display: 'flex' } }}>
               {TABS.map(({ id, label }) => {
                 const isActive = activeTab === id
                 return (
@@ -216,7 +215,7 @@ export default function App() {
                   >
                     {label}
                     {/* Hard words indicator badge */}
-                    {id === 'revise' && hardCount > 0 && (
+                    {id === 'revise' && savedWords.filter((w) => w.difficulty === 'hard').length > 0 && (
                       <span style={{
                         background: '#ef4444',
                         color: '#fff',
@@ -226,7 +225,7 @@ export default function App() {
                         padding: '1px 5px',
                         lineHeight: 1.4,
                       }}>
-                        {hardCount > 99 ? '99+' : hardCount}
+                        {savedWords.filter((w) => w.difficulty === 'hard').length > 99 ? '99+' : savedWords.filter((w) => w.difficulty === 'hard').length}
                       </span>
                     )}
                   </button>
@@ -237,7 +236,7 @@ export default function App() {
             {/* Theme Toggle Button */}
             <button
               id="theme-toggle-btn"
-              onClick={toggleTheme}
+              onClick={() => setTheme((prev) => (prev === 'sunny' ? 'dark' : 'sunny'))}
               title={`Switch to ${theme === 'sunny' ? 'Dark' : 'Sunny'} theme`}
               aria-label={`Switch to ${theme === 'sunny' ? 'Dark' : 'Sunny'} theme`}
               style={{
@@ -259,17 +258,100 @@ export default function App() {
               {theme === 'sunny' ? (
                 <>
                   <Sun size={15} style={{ color: '#f59e0b' }} />
-                  <span style={{ color: '#fbbf24' }}>Sunny</span>
+                  <span style={{ color: '#fbbf24', display: 'none', '@media (min-width: 640px)': { display: 'inline' } }}>Sunny</span>
                 </>
               ) : (
                 <>
                   <Moon size={15} />
-                  <span>Dark</span>
+                  <span style={{ display: 'none', '@media (min-width: 640px)': { display: 'inline' } }}>Dark</span>
                 </>
               )}
             </button>
+
+            {/* Mobile hamburger menu button (visible on mobile) */}
+            <button
+              id="mobile-menu-btn"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: '6px 8px',
+                borderRadius: '8px',
+                border: '1px solid var(--border-strong)',
+                background: 'var(--bg-surface)',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+              }}
+            >
+              {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+            </button>
           </div>
         </div>
+
+        {/* Mobile menu dropdown */}
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.nav
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2 }}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '4px',
+                padding: '8px 12px',
+                borderTop: '1px solid var(--border)',
+                background: 'var(--bg-primary)',
+              }}
+            >
+              {TABS.map(({ id, label }) => {
+                const isActive = activeTab === id
+                return (
+                  <button
+                    key={id}
+                    onClick={() => {
+                      setActiveTab(id)
+                      setMobileMenuOpen(false)
+                    }}
+                    style={{
+                      padding: '10px 12px',
+                      borderRadius: '8px',
+                      border: 'none',
+                      background: isActive ? 'var(--pill-pos-bg)' : 'transparent',
+                      color: isActive ? 'var(--accent-light)' : 'var(--text-secondary)',
+                      fontFamily: 'Inter, sans-serif',
+                      fontSize: '0.9rem',
+                      fontWeight: isActive ? 600 : 500,
+                      cursor: 'pointer',
+                      transition: 'all 0.15s',
+                      textAlign: 'left',
+                    }}
+                  >
+                    {label}
+                    {id === 'revise' && savedWords.filter((w) => w.difficulty === 'hard').length > 0 && (
+                      <span style={{
+                        marginLeft: '8px',
+                        background: '#ef4444',
+                        color: '#fff',
+                        borderRadius: '999px',
+                        fontSize: '0.65rem',
+                        fontWeight: 700,
+                        padding: '1px 5px',
+                        display: 'inline-block',
+                      }}>
+                        {savedWords.filter((w) => w.difficulty === 'hard').length > 99 ? '99+' : savedWords.filter((w) => w.difficulty === 'hard').length}
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
+            </motion.nav>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* ── Page content ── */}
@@ -285,6 +367,11 @@ export default function App() {
               <RevisePage savedWords={savedWords} onUpdateWord={handleUpdateWord} loadingWords={loadingWords} />
             </motion.div>
           )}
+          {activeTab === 'similar' && (
+            <motion.div key="similar" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.2 }}>
+              <SimilarWordsPage savedWords={savedWords} loadingWords={loadingWords} />
+            </motion.div>
+          )}
           {activeTab === 'list' && (
             <motion.div key="list" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.2 }}>
               <ListPage
@@ -294,7 +381,7 @@ export default function App() {
                 onClearAll={handleClearAll}
                 activeUsername={activeUsername}
                 onUsernameChange={setActiveUsername}
-                localWords={localWords}
+                localWords={_localWords}
                 onMigrateLocalWords={handleMigrateLocalWords}
               />
             </motion.div>
