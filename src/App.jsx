@@ -188,7 +188,7 @@ export default function App() {
           {/* Right section: Desktop nav + Theme + Mobile menu */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {/* Desktop tab bar (hidden on mobile) */}
-            <nav style={{ display: 'none', gap: '2px', '@media (min-width: 640px)': { display: 'flex' } }}>
+            <nav id="desktop-nav" style={{ display: 'flex', gap: '2px' }}>
               {TABS.map(({ id, label }) => {
                 const isActive = activeTab === id
                 return (
@@ -258,12 +258,12 @@ export default function App() {
               {theme === 'sunny' ? (
                 <>
                   <Sun size={15} style={{ color: '#f59e0b' }} />
-                  <span style={{ color: '#fbbf24', display: 'none', '@media (min-width: 640px)': { display: 'inline' } }}>Sunny</span>
+                  <span id="theme-label">Sunny</span>
                 </>
               ) : (
                 <>
                   <Moon size={15} />
-                  <span style={{ display: 'none', '@media (min-width: 640px)': { display: 'inline' } }}>Dark</span>
+                  <span id="theme-label">Dark</span>
                 </>
               )}
             </button>
@@ -273,7 +273,7 @@ export default function App() {
               id="mobile-menu-btn"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               style={{
-                display: 'flex',
+                display: 'none',
                 alignItems: 'center',
                 justifyContent: 'center',
                 padding: '6px 8px',

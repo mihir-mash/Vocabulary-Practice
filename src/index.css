@@ -89,7 +89,7 @@
   /* Mobile/Responsive adjustments */
   @media (max-width: 639px) {
     /* Hide desktop nav on mobile */
-    nav {
+    #desktop-nav {
       display: none !important;
     }
     
@@ -99,14 +99,14 @@
     }
 
     /* Theme toggle text hidden on mobile */
-    #theme-toggle-btn span {
+    #theme-label {
       display: none !important;
     }
   }
 
   @media (min-width: 640px) {
     /* Show desktop nav on desktop */
-    nav {
+    #desktop-nav {
       display: flex !important;
     }
 
@@ -116,7 +116,7 @@
     }
 
     /* Theme toggle text visible on desktop */
-    #theme-toggle-btn span {
+    #theme-label {
       display: inline !important;
     }
   }
