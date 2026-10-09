@@ -60,7 +60,10 @@
 .mountain-flip-word { font-size: clamp(1.8rem, 8vw, 3rem); line-height: 1.15; letter-spacing: -.03em; font-weight: 800; overflow-wrap: anywhere; text-align: center; }
 .mountain-saved-star { display: inline-flex; vertical-align: middle; margin-left: 8px; color: var(--accent-light); }
 .mountain-flip-hint { position: absolute; bottom: 20px; font-size: .75rem; color: var(--text-secondary); }
-.mountain-flip-back { transform: rotateY(180deg); padding: 20px; max-height: min(430px, 60dvh); overflow-y: auto; }
+.mountain-flip-back { transform: rotateY(180deg); display: flex; flex-direction: column; max-height: min(430px, 60dvh); overflow: hidden; }
+.mountain-flip-content { padding: 20px; flex: 1; min-height: 0; overflow-y: auto; }
+.mountain-flip-footer { flex-shrink: 0; padding: 12px 20px; border-top: 1px solid var(--border); }
+.mountain-flip-footer .mountain-ratings { margin-top: 0; }
 .mountain-flip-back h2 { font-size: 1.3rem; font-weight: 800; overflow-wrap: anywhere; max-width: 100%; }
 .mountain-word .mountain-flip-perspective { margin-top: 14px; }
 .mountain-card-nav { border-top: 1px solid var(--border); padding-top: 14px; margin-top: 22px; }

@@ -119,8 +119,9 @@ export default function MountainPage({ activeUsername, savedWords, loadingWords,
         <section className="mountain-practice" aria-label="Vocabulary flashcards">
           <div className="mountain-toolbar"><span className="pill-pos">Group {card.group}</span><span className="mountain-caption">{index + 1} / {practiceDeck.length}</span><AudioButton word={card.word} audioUrl={card.pronunciation_url} /></div>
           <progress aria-label="Practice progress" value={index + 1} max={practiceDeck.length} />
-          <MountainFlashcard entry={card} saved={!loadingWords && saved.has(normalize(card.word))} flipped={flipped} onFlip={() => setFlipped(prev => !prev)} disabled={busy} />
-          {flipped && <Ratings disabled={busy || loadingWords} current={saved.get(normalize(card.word))?.difficulty} onRate={difficulty => saveRating(card, difficulty, true)} />}
+          <MountainFlashcard entry={card} saved={!loadingWords && saved.has(normalize(card.word))} flipped={flipped} onFlip={() => setFlipped(prev => !prev)} disabled={busy}>
+            <Ratings disabled={busy || loadingWords} current={saved.get(normalize(card.word))?.difficulty} onRate={difficulty => saveRating(card, difficulty, true)} />
+          </MountainFlashcard>
           <div className="mountain-toolbar mountain-card-nav"><button className="btn btn-ghost" disabled={index === 0 || busy} onClick={() => { setIndex(prev => prev - 1); setFlipped(false) }}><ChevronLeft size={16} /> Previous</button><button className="btn btn-ghost" disabled={busy} onClick={next}>Skip <ChevronRight size={16} /></button></div>
         </section>
       ) : <div className="card mountain-empty"><p>{filter === 'new' ? 'All selected words are already in your List. Turn off “Only new words” to practice them.' : 'No words match your filters. Change your filters in Words.'}</p></div>}
@@ -132,7 +133,7 @@ function SavedStar() {
   return <span className="mountain-saved-star" role="img" aria-label="Already in your List" title="Already in your List"><Star size={19} fill="currentColor" aria-hidden="true" /></span>
 }
 
-function MountainFlashcard({ entry, saved, flipped, onFlip, disabled }) {
+function MountainFlashcard({ entry, saved, flipped, onFlip, disabled, children }) {
   return <div className="mountain-flip-perspective">
     <div className={`mountain-flip-card ${flipped ? 'is-flipped' : ''}`}>
       <button type="button" className="card mountain-flip-front" disabled={disabled} onClick={onFlip} aria-label={`Flip ${entry.word} to see its meaning`} aria-hidden={flipped} inert={flipped}>
@@ -141,8 +142,11 @@ function MountainFlashcard({ entry, saved, flipped, onFlip, disabled }) {
         <span className="mountain-flip-hint">Tap card to flip</span>
       </button>
       <div className="card mountain-flip-back" aria-hidden={!flipped} inert={!flipped}>
-        <div className="mountain-toolbar"><h2>{entry.word}{saved && <SavedStar />}</h2><button type="button" className="btn btn-ghost" disabled={disabled} onClick={onFlip} aria-label={`Flip ${entry.word} back`}>Flip back</button></div>
-        <Meanings entry={entry} />
+        <div className="mountain-flip-content">
+          <div className="mountain-toolbar"><h2>{entry.word}{saved && <SavedStar />}</h2><button type="button" className="btn btn-ghost" disabled={disabled} onClick={onFlip} aria-label={`Flip ${entry.word} back`}>Flip back</button></div>
+          <Meanings entry={entry} />
+        </div>
+        {children && <div className="mountain-flip-footer">{children}</div>}
       </div>
     </div>
   </div>
