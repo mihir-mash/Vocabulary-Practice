@@ -1,0 +1,56 @@
+.mountain-page { max-width: 680px; margin: 0 auto; padding: 28px 20px 60px; }
+.mountain-heading { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 12px; margin-bottom: 22px; }
+.mountain-heading > div { flex: 1; min-width: 230px; }
+.mountain-eyebrow { display: flex; align-items: center; gap: 6px; color: var(--accent-light); font-size: .68rem; font-weight: 700; letter-spacing: .1em; }
+.mountain-heading h1 { font-size: clamp(1.35rem, 4.5vw, 1.8rem); letter-spacing: -.04em; font-weight: 800; margin: 10px 0 8px; line-height: 1.2; }
+.mountain-heading p, .mountain-empty p { color: var(--text-secondary); font-size: .85rem; line-height: 1.6; margin: 0; }
+.mountain-groups { padding: 18px; }
+.mountain-toolbar { display: flex; justify-content: space-between; gap: 10px; align-items: center; flex-wrap: wrap; }
+.mountain-toolbar h2 { font-size: .95rem; font-weight: 700; margin: 0; }
+.mountain-actions { display: flex; gap: 6px; }
+.mountain-group-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(48px, 1fr)); gap: 7px; margin: 14px 0; }
+.mountain-group { min-height: 55px; border: 1px solid var(--border-strong); background: var(--bg-surface); color: var(--text-secondary); border-radius: 10px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; }
+.mountain-group strong { font-size: .95rem; }
+.mountain-group small { font-size: .6rem; }
+.mountain-group.selected { background: var(--pill-pos-bg); color: var(--pill-pos-text); border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.mountain-caption { color: var(--text-secondary); font-size: .75rem; line-height: 1.5; margin: 0; }
+.mountain-controls { margin: 20px 0 16px; }
+.mountain-filters { display: flex; gap: 8px; margin-bottom: 14px; }
+.mountain-filters select { max-width: 140px; }
+.mountain-search { flex: 1; min-width: 0; position: relative; }
+.mountain-search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); }
+.mountain-search input { width: 100%; padding-left: 36px; font-size: .8rem; }
+.mountain-check { display: flex; gap: 7px; align-items: center; cursor: pointer; min-height: 44px; }
+.mountain-check input { accent-color: var(--accent); }
+.mountain-word-list { display: grid; gap: 12px; margin-top: 12px; }
+.mountain-word { padding: 18px; }
+.mountain-word-title { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; min-width: 0; }
+.mountain-word-title h2 { overflow-wrap: anywhere; font-size: 1.08rem; }
+.mountain-meanings { margin: 14px 0; }
+.mountain-meaning + .mountain-meaning { border-top: 1px solid var(--border); padding-top: 14px; margin-top: 14px; }
+.mountain-meaning p { font-size: .9rem; color: var(--text-primary); line-height: 1.6; margin: 7px 0; }
+.mountain-meaning blockquote { border-left: 2px solid var(--pill-pos-border); margin: 8px 0 10px; padding-left: 12px; color: var(--text-secondary); font-style: italic; font-size: .8rem; line-height: 1.6; }
+.mountain-synonyms { display: flex; gap: 5px; flex-wrap: wrap; }
+.mountain-ratings { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 14px; }
+.mountain-ratings button { justify-content: center; min-height: 44px; }
+[data-theme="sunny"] .mountain-ratings [data-difficulty="hard"] { color: #a12727 !important; }
+[data-theme="sunny"] .mountain-ratings [data-difficulty="medium"] { color: #805000 !important; }
+[data-theme="sunny"] .mountain-ratings [data-difficulty="easy"] { color: #146543 !important; }
+.mountain-reveal { margin-top: 12px; width: 100%; justify-content: center; min-height: 64px; }
+.mountain-empty { text-align: center; padding: 36px 20px; margin-top: 16px; }
+.mountain-empty svg { margin: 0 auto; color: var(--accent-light); }
+.mountain-empty h2 { font-size: 1.15rem; font-weight: 700; margin: 12px 0; }
+.mountain-empty .btn { margin-top: 18px; }
+.mountain-flashcard { padding: 22px; margin-top: 16px; }
+.mountain-flashcard > h2 { font-size: clamp(1.8rem, 7vw, 2.6rem); overflow-wrap: anywhere; text-align: center; padding: 38px 0; font-weight: 800; letter-spacing: -.04em; }
+.mountain-flashcard > .btn { display: flex; margin: 0 auto 24px; min-height: 44px; }
+.mountain-flashcard progress { width: 100%; height: 5px; accent-color: var(--accent); margin-top: 18px; }
+.mountain-card-nav { border-top: 1px solid var(--border); padding-top: 14px; margin-top: 22px; }
+.mountain-status { padding: 10px 14px; color: var(--text-primary); background: var(--pill-pos-bg); border-radius: 10px; font-size: .82rem; }
+.mountain-page button:focus-visible, .mountain-page input:focus-visible, .mountain-page select:focus-visible { outline: 2px solid var(--accent-light); outline-offset: 3px; }
+@media (max-width: 400px) {
+  .mountain-page { padding: 22px 12px 50px; }
+  .mountain-groups, .mountain-word, .mountain-flashcard { padding: 14px; }
+  .mountain-filters { flex-direction: column; }
+  .mountain-filters select { max-width: none; width: 100%; }
+}

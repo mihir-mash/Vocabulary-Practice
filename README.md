@@ -1,5 +1,27 @@
 # 🎓 GRE AI Vocab - Smart Vocabulary Flashcards
 
+### Mountain groups
+
+The Mountain tab contains all 34 groups (1,020 words), with group selection,
+search, difficulty filters, pronunciation, hidden meanings, and flashcard practice.
+Ratings save to the active account's existing List and Revise deck. Group selections
+persist in this browser per username; saved word difficulty syncs through Firestore.
+
+The root `vocab.json` is ignored by Git. The app uses the checked-in
+`src/data/mountainWords.json` so production builds include every group. After
+changing the local source, run `node scripts/import-mountain.mjs` to refresh and
+validate the app dataset.
+
+Similarity groups require direct synonym links or multiple shared synonyms,
+exclude explicit antonyms, and require every pair in a group to match. The
+displayed percentage measures lexical evidence, rather than a probability that
+two words have identical meanings. Words with insufficient evidence stay ungrouped.
+Run similarity regression tests with `node --test src/lib/similarity.test.js`.
+Run dataset and group rendering checks with `node scripts/verify-mountain.mjs`.
+The source repeats "cumbersome" in groups 11 and 22; combined group selection
+shows that word once. The import fills the missing adjective meaning of
+"appropriate" while leaving the root source unchanged.
+
 A modern, responsive web application for mastering GRE vocabulary using AI-generated insights and a priority-weighted learning system. Fully cloud-synced across mobile and desktop with passwordless account management via Firebase.
 
 ---

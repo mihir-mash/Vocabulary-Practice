@@ -8,15 +8,12 @@ export default function SimilarWordsPage({ savedWords, loadingWords }) {
   const [expandedGroupIndex, setExpandedGroupIndex] = useState(null)
   const [selectedWord, setSelectedWord] = useState(null)
 
-  console.log('SimilarWordsPage rendered', { savedWords: savedWords?.length, loadingWords })
 
   // Compute groups from saved words
   const groups = useMemo(() => {
-    if (!savedWords || savedWords.length < 3) return []
+    if (!savedWords || savedWords.length < 2) return []
     try {
-      console.log('Computing groups for', savedWords.length, 'words')
       const result = groupSimilarWords(savedWords)
-      console.log('Found', result.length, 'groups')
       return result
     } catch (error) {
       console.error('Error computing word groups:', error)
@@ -53,6 +50,9 @@ export default function SimilarWordsPage({ savedWords, loadingWords }) {
         <p style={{ fontSize: '0.88rem', margin: 0 }}>
           No words saved yet. Use the Search tab to add words and discover word groups.
         </p>
+        <p style={{ color: 'var(--text-secondary)', margin: '8px 0 0', fontSize: '0.75rem', lineHeight: 1.5 }}>
+          Strongest synonym matches first. Each word appears in one group; percentages describe synonym evidence.
+        </p>
       </div>
     )
   }
@@ -63,7 +63,7 @@ export default function SimilarWordsPage({ savedWords, loadingWords }) {
       <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
         <p style={{ fontSize: '0.88rem', margin: 0 }}>
           You have {savedWords.length} word{savedWords.length !== 1 ? 's' : ''}, but groups
-          need at least 3 semantically similar words.
+          need at least 2 words with strong synonym evidence.
           <br />
           Keep adding more words to see groups appear!
         </p>

@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useEffect } from 'react'
+import { useState, useCallback, useMemo, useEffect, lazy, Suspense } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Sun, Moon, User, Menu, X } from 'lucide-react'
 import { collection, onSnapshot, doc, setDoc, deleteDoc, writeBatch } from 'firebase/firestore'
@@ -8,8 +8,10 @@ import SearchPage from './pages/SearchPage'
 import RevisePage from './pages/RevisePage'
 import ListPage from './pages/ListPage'
 import SimilarWordsPage from './pages/SimilarWordsPage'
+const MountainPage = lazy(() => import('./pages/MountainPage'))
 
 const TABS = [
+  { id: 'mountain', label: 'Mountain' },
   { id: 'search', label: 'Search' },
   { id: 'revise', label: 'Revise' },
   { id: 'similar', label: 'Similar' },
@@ -357,6 +359,13 @@ export default function App() {
       {/* ── Page content ── */}
       <main style={{ flex: 1 }}>
         <AnimatePresence mode="wait">
+          {activeTab === 'mountain' && (
+            <motion.div key="mountain" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.2 }}>
+              <Suspense fallback={<p role="status" style={{ padding: '24px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading vocabulary groups…</p>}>
+                <MountainPage key={activeUsername} activeUsername={activeUsername} savedWords={savedWords} loadingWords={loadingWords} onSaveWord={handleSaveWord} onUpdateWord={handleUpdateWord} />
+              </Suspense>
+            </motion.div>
+          )}
           {activeTab === 'search' && (
             <motion.div key="search" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.2 }}>
               <SearchPage savedWords={savedWords} onSaveWord={handleSaveWord} />
@@ -375,6 +384,7 @@ export default function App() {
           {activeTab === 'list' && (
             <motion.div key="list" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.2 }}>
               <ListPage
+                onUpdateWord={handleUpdateWord}
                 savedWords={savedWords}
                 loadingWords={loadingWords}
                 onDeleteWord={handleDeleteWord}

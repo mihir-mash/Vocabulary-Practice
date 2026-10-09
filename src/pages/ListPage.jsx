@@ -8,6 +8,7 @@ export default function ListPage({
   savedWords,
   loadingWords,
   onDeleteWord,
+  onUpdateWord,
   onClearAll,
   activeUsername,
   onUsernameChange,
@@ -259,6 +260,7 @@ export default function ListPage({
                 isExpanded={expandedWord === word.word}
                 onToggle={() => toggleExpand(word.word)}
                 onDelete={() => onDeleteWord(word.word)}
+                onUpdateWord={onUpdateWord}
               />
             ))}
           </AnimatePresence>
@@ -311,7 +313,20 @@ export default function ListPage({
   )
 }
 
-function ExpandableWordRow({ word, index, isExpanded, onToggle, onDelete }) {
+function ExpandableWordRow({ word, index, isExpanded, onToggle, onDelete, onUpdateWord }) {
+  const [editingDifficulty, setEditingDifficulty] = useState(false)
+  const [savingDifficulty, setSavingDifficulty] = useState(false)
+  const [difficultyError, setDifficultyError] = useState('')
+  const changeDifficulty = async difficulty => {
+    setSavingDifficulty(true)
+    setDifficultyError('')
+    try {
+      await onUpdateWord({ ...word, difficulty })
+      setEditingDifficulty(false)
+    } catch {
+      setDifficultyError('Could not save difficulty. Please try again.')
+    } finally { setSavingDifficulty(false) }
+  }
   const badge = getDifficultyBadge(word.difficulty)
 
   return (
@@ -347,7 +362,11 @@ function ExpandableWordRow({ word, index, isExpanded, onToggle, onDelete }) {
               {word.partOfSpeech}
             </span>
           )}
-          <span
+          <button
+            type="button"
+            aria-label={`Change difficulty for ${word.word}: ${badge.label}`}
+            aria-expanded={isExpanded && editingDifficulty}
+            onClick={e => { e.stopPropagation(); if (!isExpanded) onToggle(); setEditingDifficulty(prev => !prev) }}
             style={{
               fontSize: '0.7rem',
               fontWeight: 600,
@@ -363,7 +382,7 @@ function ExpandableWordRow({ word, index, isExpanded, onToggle, onDelete }) {
           >
             {word.difficulty === 'hard' && <Flame size={10} />}
             {badge.label}
-          </span>
+          </button>
         </div>
 
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -413,6 +432,16 @@ function ExpandableWordRow({ word, index, isExpanded, onToggle, onDelete }) {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Audio & Status */}
+            {editingDifficulty && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '14px' }}>
+                {['hard', 'medium', 'easy'].filter(d => d !== word.difficulty).map(d => (
+                  <button key={d} className="btn btn-ghost" disabled={savingDifficulty} onClick={() => changeDifficulty(d)}>
+                    {savingDifficulty ? 'Saving…' : `Set to ${getDifficultyBadge(d).label}`}
+                  </button>
+                ))}
+              </div>
+            )}
+            {difficultyError && <p role="alert" style={{ color: '#f87171' }}>{difficultyError}</p>}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
               <AudioButton word={word.word} audioUrl={word.audioUrl} size="sm" />
               <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>

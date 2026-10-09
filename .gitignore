@@ -1,4 +1,6 @@
 # Logs
+/vocab.json
+
 logs
 *.log
 npm-debug.log*
