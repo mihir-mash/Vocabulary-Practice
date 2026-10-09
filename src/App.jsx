@@ -9,6 +9,7 @@ import RevisePage from './pages/RevisePage'
 import ListPage from './pages/ListPage'
 import SimilarWordsPage from './pages/SimilarWordsPage'
 const MountainPage = lazy(() => import('./pages/MountainPage'))
+const EMPTY_WORDS = []
 
 const TABS = [
   { id: 'mountain', label: 'Mountain' },
@@ -28,8 +29,12 @@ export default function App() {
   const [activeTab, setActiveTab]           = useState('search')
   const [activeUsername, setActiveUsername] = useLocalStorage('activeUsername', 'mihir')
   const [_localWords]                       = useLocalStorage('vocab-srs-words', [])
-  const [savedWords, setSavedWords]         = useState([])
-  const [loadingWords, setLoadingWords]     = useState(true)
+  const [wordAccount, setWordAccount]      = useState({ username: null, words: [], loading: true })
+  const cleanActiveUsername = (activeUsername || 'mihir').trim().toLowerCase()
+  // Never expose the previous account's words, even for the render before
+  // the new subscription effect starts or when the new subscription fails.
+  const savedWords = wordAccount.username === cleanActiveUsername ? wordAccount.words : EMPTY_WORDS
+  const loadingWords = wordAccount.username !== cleanActiveUsername || wordAccount.loading
   const [theme, setTheme]                   = useLocalStorage('vocab-srs-theme', 'sunny')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
@@ -43,23 +48,23 @@ export default function App() {
     const cleanUsername = (activeUsername || 'mihir').trim().toLowerCase()
     if (!cleanUsername) return
 
-    setLoadingWords(true)
+    let subscribed = true
     const wordsRef = collection(db, 'users', cleanUsername, 'words')
 
     const unsubscribe = onSnapshot(
       wordsRef,
       (snapshot) => {
+        if (!subscribed) return
         const words = snapshot.docs.map((docSnap) => docSnap.data())
-        setSavedWords(words)
-        setLoadingWords(false)
+        setWordAccount({ username: cleanUsername, words, loading: false })
       },
       (err) => {
         console.error('Firestore snapshot error:', err)
-        setLoadingWords(false)
+        if (subscribed) setWordAccount({ username: cleanUsername, words: [], loading: false })
       }
     )
 
-    return () => unsubscribe()
+    return () => { subscribed = false; unsubscribe() }
   }, [activeUsername])
 
   const _hardCount = useMemo(() => savedWords.filter((w) => w.difficulty === 'hard').length, [savedWords])

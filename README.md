@@ -4,6 +4,10 @@
 
 The Mountain tab contains all 34 groups (1,020 words), with group selection,
 search, difficulty filters, pronunciation, hidden meanings, and flashcard practice.
+It opens in Practice with tap-to-flip cards. Saved words remain in every full
+group deck and display a star; "Only new words" restricts practice to words
+outside the active user's List. Group counts show that user's saved words out
+of 30. Switching accounts clears the previous account's visible word data.
 Ratings save to the active account's existing List and Revise deck. Group selections
 persist in this browser per username; saved word difficulty syncs through Firestore.
 
@@ -17,6 +21,7 @@ exclude explicit antonyms, and require every pair in a group to match. The
 displayed percentage measures lexical evidence, rather than a probability that
 two words have identical meanings. Words with insufficient evidence stay ungrouped.
 Run similarity regression tests with `node --test src/lib/similarity.test.js`.
+Run Mountain filtering checks with `node --test src/lib/mountain.test.js`.
 Run dataset and group rendering checks with `node scripts/verify-mountain.mjs`.
 The source repeats "cumbersome" in groups 11 and 22; combined group selection
 shows that word once. The import fills the missing adjective meaning of
