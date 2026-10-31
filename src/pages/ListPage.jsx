@@ -17,6 +17,8 @@ export default function ListPage({
 }) {
   const [confirmClear, setConfirmClear] = useState(false)
   const [searchFilter, setSearchFilter] = useState('')
+  const [difficultyFilter, setDifficultyFilter] = useState('all')
+  const [sortOrder, setSortOrder] = useState('name-asc')
   const [expandedWord, setExpandedWord] = useState(null)
   
   // Username editing state
@@ -55,9 +57,17 @@ export default function ListPage({
     }
   }
 
+  const difficultyRank = { hard: 0, medium: 1, easy: 2 }
   const filtered = savedWords.filter((w) =>
-    (w.word || '').toLowerCase().includes(searchFilter.toLowerCase())
-  )
+    (w.word || '').toLowerCase().includes(searchFilter.trim().toLowerCase()) &&
+    (difficultyFilter === 'all' || (w.difficulty || 'medium') === difficultyFilter)
+  ).sort((a, b) => {
+    const byName = (a.word || '').localeCompare(b.word || '', undefined, { sensitivity: 'base' })
+    if (sortOrder === 'name-desc') return -byName
+    if (sortOrder === 'difficulty-desc') return (difficultyRank[a.difficulty] ?? 1) - (difficultyRank[b.difficulty] ?? 1) || byName
+    if (sortOrder === 'difficulty-asc') return (difficultyRank[b.difficulty] ?? 1) - (difficultyRank[a.difficulty] ?? 1) || byName
+    return byName
+  })
 
   const toggleExpand = (wordStr) => {
     setExpandedWord((prev) => (prev === wordStr ? null : wordStr))
@@ -219,7 +229,7 @@ export default function ListPage({
       )}
 
       {/* Filter search box */}
-      {!loadingWords && savedWords.length > 2 && (
+      {!loadingWords && savedWords.length > 0 && (
         <div style={{ position: 'relative', marginBottom: '14px' }}>
           <Search size={15} style={{
             position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)',
@@ -236,6 +246,44 @@ export default function ListPage({
         </div>
       )}
 
+      {!loadingWords && savedWords.length > 0 && (
+        <div style={{ marginBottom: '18px' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+            <label style={{ flex: '1 1 150px', minWidth: 0, color: 'var(--text-secondary)', fontSize: '0.78rem' }}>
+              Difficulty
+              <select
+                value={difficultyFilter}
+                onChange={e => setDifficultyFilter(e.target.value)}
+                className="field"
+                style={{ display: 'block', width: '100%', marginTop: '6px', minHeight: '44px', fontSize: '0.85rem' }}
+              >
+                <option value="all">All difficulties</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </label>
+            <label style={{ flex: '1 1 220px', minWidth: 0, color: 'var(--text-secondary)', fontSize: '0.78rem' }}>
+              Sort by
+              <select
+                value={sortOrder}
+                onChange={e => setSortOrder(e.target.value)}
+                className="field"
+                style={{ display: 'block', width: '100%', marginTop: '6px', minHeight: '44px', fontSize: '0.85rem' }}
+              >
+                <option value="name-asc">Name: A to Z</option>
+                <option value="name-desc">Name: Z to A</option>
+                <option value="difficulty-desc">Difficulty: Hard → Medium → Easy</option>
+                <option value="difficulty-asc">Difficulty: Easy → Medium → Hard</option>
+              </select>
+            </label>
+          </div>
+          <p role="status" style={{ margin: '10px 0 0', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
+            Showing {filtered.length} of {savedWords.length} words
+          </p>
+        </div>
+      )}
+
       {/* Empty State */}
       {!loadingWords && savedWords.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '50px 20px', color: 'var(--text-muted)' }}>
@@ -246,7 +294,7 @@ export default function ListPage({
       ) : !loadingWords && filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '30px 20px', color: 'var(--text-muted)' }}>
           <p style={{ fontSize: '0.88rem', margin: 0 }}>
-            No words matching "{searchFilter}".
+            No words match your search and difficulty filter.
           </p>
         </div>
       ) : !loadingWords && (
