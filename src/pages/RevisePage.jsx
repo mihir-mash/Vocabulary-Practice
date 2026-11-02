@@ -2,7 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import FlashCard from '../components/FlashCard';
 import { rateWord, buildPracticeDeck } from '../lib/srs';
-import { RotateCw, CheckCircle2, Flame, Loader2 } from 'lucide-react';
+import { RotateCw, Shuffle, CheckCircle2, Flame, Loader2 } from 'lucide-react';
 
 const DIFFICULTIES = ['hard', 'medium', 'easy'];
 const DIFFICULTY_LABELS = { hard: 'Hard', medium: 'Medium', easy: 'Easy' };
@@ -130,6 +130,20 @@ export default function RevisePage({ savedWords, onUpdateWord, loadingWords }) {
           </button>
         ))}
       </nav>
+
+      {/* Shuffle only when requested. This always starts a fresh round at card 1. */}
+      <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+        <button
+          type="button"
+          className="btn btn-ghost"
+          onClick={() => startSession(selectedDifficulty)}
+          aria-label={`Shuffle ${DIFFICULTY_LABELS[selectedDifficulty].toLowerCase()} words and restart practice`}
+          style={{ display: 'inline-flex', alignItems: 'center', gap: '7px' }}
+        >
+          <Shuffle size={15} />
+          Shuffle {DIFFICULTY_LABELS[selectedDifficulty]} Words
+        </button>
+      </div>
 
       {/* ── Session finished ── */}
       {isFinished ? (
