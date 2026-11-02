@@ -42,9 +42,10 @@ export default function RevisePage({ savedWords, onUpdateWord, loadingWords }) {
 
   // Rebuild when difficulty tab changes
   useEffect(() => {
+    if (loadingWords) return
     startSession(selectedDifficulty);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDifficulty]);
+  }, [selectedDifficulty, loadingWords]);
 
   const totalCards = sessionDeck.length;
 

@@ -363,31 +363,22 @@ export default function App() {
 
       {/* ── Page content ── */}
       <main style={{ flex: 1 }}>
-        <AnimatePresence mode="wait">
-          {activeTab === 'mountain' && (
-            <motion.div key="mountain" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.2 }}>
+        <div>
+            <motion.div key="mountain" style={{ display: activeTab === 'mountain' ? 'block' : 'none' }} variants={pageVariants} initial="initial" animate="animate" transition={{ duration: 0.2 }}>
               <Suspense fallback={<p role="status" style={{ padding: '24px', textAlign: 'center', color: 'var(--text-secondary)' }}>Loading vocabulary groups…</p>}>
                 <MountainPage key={activeUsername} activeUsername={activeUsername} savedWords={savedWords} loadingWords={loadingWords} onSaveWord={handleSaveWord} onUpdateWord={handleUpdateWord} />
               </Suspense>
             </motion.div>
-          )}
-          {activeTab === 'search' && (
-            <motion.div key="search" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.2 }}>
+            <motion.div key="search" style={{ display: activeTab === 'search' ? 'block' : 'none' }} variants={pageVariants} initial="initial" animate="animate" transition={{ duration: 0.2 }}>
               <SearchPage savedWords={savedWords} onSaveWord={handleSaveWord} />
             </motion.div>
-          )}
-          {activeTab === 'revise' && (
-            <motion.div key="revise" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.2 }}>
+            <motion.div key="revise" style={{ display: activeTab === 'revise' ? 'block' : 'none' }} variants={pageVariants} initial="initial" animate="animate" transition={{ duration: 0.2 }}>
               <RevisePage savedWords={savedWords} onUpdateWord={handleUpdateWord} loadingWords={loadingWords} />
             </motion.div>
-          )}
-          {activeTab === 'similar' && (
-            <motion.div key="similar" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.2 }}>
+            <motion.div key="similar" style={{ display: activeTab === 'similar' ? 'block' : 'none' }} variants={pageVariants} initial="initial" animate="animate" transition={{ duration: 0.2 }}>
               <SimilarWordsPage savedWords={savedWords} loadingWords={loadingWords} />
             </motion.div>
-          )}
-          {activeTab === 'list' && (
-            <motion.div key="list" variants={pageVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.2 }}>
+            <motion.div key="list" style={{ display: activeTab === 'list' ? 'block' : 'none' }} variants={pageVariants} initial="initial" animate="animate" transition={{ duration: 0.2 }}>
               <ListPage
                 onUpdateWord={handleUpdateWord}
                 savedWords={savedWords}
@@ -400,8 +391,7 @@ export default function App() {
                 onMigrateLocalWords={handleMigrateLocalWords}
               />
             </motion.div>
-          )}
-        </AnimatePresence>
+        </div>
       </main>
     </div>
   )
