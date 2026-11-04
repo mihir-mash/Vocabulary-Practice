@@ -2,7 +2,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import FlashCard from '../components/FlashCard';
 import { rateWord, buildPracticeDeck } from '../lib/srs';
-import { RotateCw, Shuffle, CheckCircle2, Flame, Loader2 } from 'lucide-react';
+import { RotateCw, Shuffle, ChevronLeft, CheckCircle2, Flame, Loader2 } from 'lucide-react';
 
 const DIFFICULTIES = ['hard', 'medium', 'easy'];
 const DIFFICULTY_LABELS = { hard: 'Hard', medium: 'Medium', easy: 'Easy' };
@@ -71,6 +71,12 @@ export default function RevisePage({ savedWords, onUpdateWord, loadingWords }) {
   const handleRestart = useCallback(() => {
     startSession(selectedDifficulty);
   }, [startSession, selectedDifficulty]);
+
+  const handlePrevious = useCallback(() => {
+    if (currentIndex === 0) return;
+    if (isFinished) setIsFinished(false);
+    setCurrentIndex(index => Math.max(0, index - 1));
+  }, [currentIndex, isFinished]);
 
   // ── Loading state ────────────────────────────────────────────────
   if (loadingWords) {
@@ -252,6 +258,16 @@ export default function RevisePage({ savedWords, onUpdateWord, loadingWords }) {
                 cardIndex={currentIndex}
                 totalCards={totalCards}
               />
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={handlePrevious}
+                disabled={currentIndex === 0 || isFinished}
+                aria-label="Go to previous revision word"
+                style={{ display: 'flex', alignItems: 'center', gap: '6px', margin: '14px auto 0' }}
+              >
+                <ChevronLeft size={16} /> Previous
+              </button>
             </motion.div>
           </AnimatePresence>
         </>

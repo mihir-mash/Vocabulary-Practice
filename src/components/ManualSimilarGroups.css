@@ -1,0 +1,16 @@
+.manual-similar { padding: 18px; margin-bottom: 24px; }
+.manual-similar-heading h2 { margin: 0 0 4px; font-size: 1rem; }
+.manual-similar-heading p, .manual-similar-empty { margin: 0; color: var(--text-secondary); font-size: .78rem; line-height: 1.5; }
+.manual-similar-search { position: relative; margin: 14px 0 8px; }
+.manual-similar-search svg { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+.manual-similar-search input { padding: 11px 12px 11px 36px; }
+.manual-word-results { display: grid; gap: 5px; max-height: 210px; overflow-y: auto; margin-bottom: 10px; }
+.manual-word-result { display: flex; justify-content: space-between; align-items: center; min-height: 42px; padding: 8px 11px; border: 1px solid var(--border); border-radius: 9px; background: var(--bg-surface); color: var(--text-primary); text-align: left; cursor: pointer; }
+.manual-word-result span { color: var(--text-muted); font-size: .72rem; }
+.manual-word-result.selected { border-color: var(--accent); background: var(--pill-pos-bg); }
+.manual-similar-actions, .manual-group-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.manual-group-list { display: grid; gap: 10px; margin-top: 18px; }
+.manual-group { padding: 13px; border: 1px solid var(--border-strong); border-radius: 12px; background: var(--bg-surface); }
+.manual-group-words { display: flex; flex-wrap: wrap; gap: 6px; }
+.manual-group-words .pill-syn { display: inline-flex; align-items: center; gap: 5px; }
+.manual-group-words button { display: inline-flex; border: 0; padding: 0; background: transparent; color: inherit; cursor: pointer; }

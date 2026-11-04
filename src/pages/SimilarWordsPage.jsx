@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Loader2 } from 'lucide-react'
 import { groupSimilarWords } from '../lib/similarity'
 import SimilarWordsGroup from '../components/SimilarWordsGroup'
+import ManualSimilarGroups from '../components/ManualSimilarGroups'
 
-export default function SimilarWordsPage({ savedWords, loadingWords }) {
+export default function SimilarWordsPage({ savedWords, loadingWords, manualGroups = [], onCreateManualGroup, onUpdateManualGroup, onDeleteManualGroup }) {
   const [expandedGroupIndex, setExpandedGroupIndex] = useState(null)
   const [selectedWord, setSelectedWord] = useState(null)
 
@@ -44,33 +45,7 @@ export default function SimilarWordsPage({ savedWords, loadingWords }) {
   }
 
   // ── No words saved ──────────────────────────────────────────────
-  if (!savedWords || savedWords.length === 0) {
-    return (
-      <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
-        <p style={{ fontSize: '0.88rem', margin: 0 }}>
-          No words saved yet. Use the Search tab to add words and discover word groups.
-        </p>
-        <p style={{ color: 'var(--text-secondary)', margin: '8px 0 0', fontSize: '0.75rem', lineHeight: 1.5 }}>
-          Strongest synonym matches first. Each word appears in one group; percentages describe synonym evidence.
-        </p>
-      </div>
-    )
-  }
-
   // ── Not enough words for groups ────────────────────────────────────
-  if (groups.length === 0) {
-    return (
-      <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--text-muted)' }}>
-        <p style={{ fontSize: '0.88rem', margin: 0 }}>
-          You have {savedWords.length} word{savedWords.length !== 1 ? 's' : ''}, but groups
-          need at least 2 words with strong synonym evidence.
-          <br />
-          Keep adding more words to see groups appear!
-        </p>
-      </div>
-    )
-  }
-
   return (
     <div style={{ padding: '24px 20px 60px', maxWidth: '640px', margin: '0 auto' }}>
       {/* Page header */}
@@ -90,6 +65,16 @@ export default function SimilarWordsPage({ savedWords, loadingWords }) {
           to expand
         </p>
       </div>
+
+      <ManualSimilarGroups
+        words={savedWords || []}
+        groups={manualGroups}
+        onCreateGroup={onCreateManualGroup}
+        onUpdateGroup={onUpdateManualGroup}
+        onDeleteGroup={onDeleteManualGroup}
+      />
+      {groups.length === 0 && <p style={{ color: 'var(--text-secondary)', fontSize: '0.82rem', margin: '0 0 14px' }}>No automatic groups currently meet the similarity threshold.</p>}
+      {groups.length > 0 && <h2 style={{ fontSize: '0.95rem', margin: '0 0 10px', color: 'var(--text-primary)' }}>Automatic groups</h2>}
 
       {/* Groups grid */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>

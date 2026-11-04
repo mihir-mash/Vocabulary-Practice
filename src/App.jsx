@@ -30,6 +30,7 @@ export default function App() {
   const [activeUsername, setActiveUsername] = useLocalStorage('activeUsername', 'mihir')
   const [_localWords]                       = useLocalStorage('vocab-srs-words', [])
   const [wordAccount, setWordAccount]      = useState({ username: null, words: [], loading: true })
+  const [manualGroups, setManualGroups] = useState([])
   const cleanActiveUsername = (activeUsername || 'mihir').trim().toLowerCase()
   // Never expose the previous account's words, even for the render before
   // the new subscription effect starts or when the new subscription fails.
@@ -66,6 +67,21 @@ export default function App() {
 
     return () => { subscribed = false; unsubscribe() }
   }, [activeUsername])
+
+  useEffect(() => {
+    const ref = collection(db, 'users', cleanActiveUsername, 'manualGroups')
+    return onSnapshot(ref, snapshot => setManualGroups(snapshot.docs.map(item => item.data())), () => setManualGroups([]))
+  }, [cleanActiveUsername])
+
+  const createManualGroup = useCallback(async (words) => {
+    const group = { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, words: words.map(word => word.word), createdAt: new Date().toISOString() }
+    await setDoc(doc(db, 'users', cleanActiveUsername, 'manualGroups', group.id), group)
+  }, [cleanActiveUsername])
+  const updateManualGroup = useCallback(async (id, words) => {
+    const uniqueWords = [...new Set(words.map(word => typeof word === 'string' ? word : word.word))]
+    await setDoc(doc(db, 'users', cleanActiveUsername, 'manualGroups', id), { id, words: uniqueWords }, { merge: true })
+  }, [cleanActiveUsername])
+  const deleteManualGroup = useCallback(id => deleteDoc(doc(db, 'users', cleanActiveUsername, 'manualGroups', id)), [cleanActiveUsername])
 
   const _hardCount = useMemo(() => savedWords.filter((w) => w.difficulty === 'hard').length, [savedWords])
 
@@ -376,7 +392,7 @@ export default function App() {
               <RevisePage savedWords={savedWords} onUpdateWord={handleUpdateWord} loadingWords={loadingWords} />
             </motion.div>
             <motion.div key="similar" style={{ display: activeTab === 'similar' ? 'block' : 'none' }} variants={pageVariants} initial="initial" animate="animate" transition={{ duration: 0.2 }}>
-              <SimilarWordsPage savedWords={savedWords} loadingWords={loadingWords} />
+              <SimilarWordsPage savedWords={savedWords} loadingWords={loadingWords} manualGroups={manualGroups} onCreateManualGroup={createManualGroup} onUpdateManualGroup={updateManualGroup} onDeleteManualGroup={deleteManualGroup} />
             </motion.div>
             <motion.div key="list" style={{ display: activeTab === 'list' ? 'block' : 'none' }} variants={pageVariants} initial="initial" animate="animate" transition={{ duration: 0.2 }}>
               <ListPage
